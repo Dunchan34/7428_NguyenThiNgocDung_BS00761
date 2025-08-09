@@ -7,7 +7,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import confusion_matrix
 
-st.set_option('deprecation.showPyplotGlobalUse', False)
 st.title('Machine Failure Analysis')
 
 # Bạn có thể thay phần upload bằng đọc file trực tiếp từ Github nếu muốn
