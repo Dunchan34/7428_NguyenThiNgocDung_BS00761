@@ -1,64 +1,99 @@
 import streamlit as st
 import pandas as pd
-import joblib
+import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import confusion_matrix
 
-st.title("Product Quality Prediction - P7 Demo")
+st.set_option('deprecation.showPyplotGlobalUse', False)
+st.title('Machine Failure Analysis')
 
-@st.cache_resource
-def load_model():
-    return joblib.load('quality_model.pkl')
+# Bạn có thể thay phần upload bằng đọc file trực tiếp từ Github nếu muốn
+uploaded_file = st.file_uploader("Upload your CSV data file (ai4i2020.csv)", type=["csv"])
 
-# Load model
-try:
-    model = load_model()
-except:
-    model = None
-    st.warning("Model file quality_model.pkl not found. Upload model to repo for predictions.")
-
-uploaded_file = st.sidebar.file_uploader("Upload CSV dataset", type=['csv'])
 if uploaded_file is not None:
     df = pd.read_csv(uploaded_file)
-    st.subheader("Uploaded Data Preview")
-    st.dataframe(df.head())
 
-    # EDA plots
-    st.subheader("EDA Charts")
-    if 'Air temperature [K]' in df.columns:
-        plt.figure()
-        sns.histplot(df['Air temperature [K]'], kde=True)
-        st.pyplot()
+    # Đổi tên cột để dùng cho sau
+    df = df.rename(columns={'Air temperature [K]': 'machine_temperature'})
 
-    if 'Process temperature [K]' in df.columns:
-        plt.figure()
-        sns.histplot(df['Process temperature [K]'], kde=True)
-        st.pyplot()
+    # Tạo cột defect_status
+    df['defect_status'] = df['Machine failure']
 
-    if 'Rotational speed [rpm]' in df.columns:
-        plt.figure()
-        sns.histplot(df['Rotational speed [rpm]'], kde=True)
-        st.pyplot()
+    # Phân loại chất lượng vật liệu dựa trên Torque
+    def classify_quality(torque):
+        if torque < 30:
+            return 'L'  # Low
+        elif torque < 50:
+            return 'M'  # Medium
+        else:
+            return 'H'  # High
 
-    if 'Torque [Nm]' in df.columns:
-        plt.figure()
-        sns.histplot(df['Torque [Nm]'], kde=True)
-        st.pyplot()
+    df['material_quality'] = df['Torque [Nm]'].apply(classify_quality)
 
-    if 'Tool wear [min]' in df.columns:
-        plt.figure()
-        sns.histplot(df['Tool wear [min]'], kde=True)
-        st.pyplot()
+    # Tạo dữ liệu giả lập cho độ ẩm và thời gian chờ (lead_time)
+    df['humidity'] = np.random.uniform(40, 80, size=len(df))
+    df['lead_time'] = np.random.randint(10, 60, size=len(df))
 
-    # Prediction
-    if model is not None:
-        try:
-            preds = model.predict(df)
-            df['Predicted'] = preds
-            st.subheader("Prediction Results")
-            st.dataframe(df.head())
-        except Exception as e:
-            st.error(f"Prediction failed: {e}")
+    st.header("Figure 37: Distribution of Machine Temperature")
+    plt.figure(figsize=(8, 6))
+    sns.histplot(df['machine_temperature'], kde=True, color='blue')
+    plt.xlabel('Air Temperature (K)')
+    plt.ylabel('Frequency')
+    st.pyplot()
+
+    st.header("Figure 38: Defect Rates by Material Quality")
+    defect_rates = df.groupby('material_quality')['defect_status'].mean().reset_index()
+    plt.figure(figsize=(8, 6))
+    sns.barplot(x='material_quality', y='defect_status', data=defect_rates,
+                palette=['#1f77b4', '#ff7f0e', '#2ca02c'])
+    plt.xlabel('Material Quality (L: Low, M: Medium, H: High)')
+    plt.ylabel('Defect Rate')
+    st.pyplot()
+
+    st.header("Figure 39: Correlation Heatmap")
+    corr = df[['machine_temperature', 'humidity', 'lead_time', 'defect_status']].corr()
+    plt.figure(figsize=(8, 6))
+    sns.heatmap(corr, annot=True, cmap='coolwarm', vmin=-1, vmax=1)
+    st.pyplot()
+
+    st.header("Figure 40: Boxplot of Defects vs. Machine Temperature")
+    plt.figure(figsize=(8, 6))
+    sns.boxplot(x='defect_status', y='machine_temperature', data=df)
+    plt.xlabel('Defect Status (0: Pass, 1: Fail)')
+    plt.ylabel('Machine Temperature (K)')
+    st.pyplot()
+
+    st.header("Figure 42: Errors vs. Humidity Box Plot")
+    plt.figure(figsize=(8, 6))
+    sns.boxplot(x='defect_status', y='humidity', data=df)
+    plt.xlabel('Defect Status (0: Pass, 1: Fail)')
+    plt.ylabel('Humidity (%)')
+    st.pyplot()
+
+    # Logistic Regression model
+    st.header("Logistic Regression Model")
+
+    features = ['machine_temperature', 'Torque [Nm]', 'Tool wear [min]']
+    X = df[features]
+    y = df['defect_status']
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    model = LogisticRegression(max_iter=1000)
+    model.fit(X_train, y_train)
+
+    y_pred = model.predict(X_test)
+    cm = confusion_matrix(y_test, y_pred)
+
+    st.subheader("Confusion Matrix")
+    plt.figure(figsize=(6, 4))
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
+    plt.xlabel('Predicted')
+    plt.ylabel('Actual')
+    st.pyplot()
+
 else:
-    st.info("Upload a CSV file to start analysis.")
+    st.info("Please upload the ai4i2020.csv file to start the analysis.")
