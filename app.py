@@ -7,7 +7,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import confusion_matrix
 from sklearn.tree import DecisionTreeClassifier, export_graphviz
-import graphviz
+
 
 st.title('Machine Failure Analysis')
 
