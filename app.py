@@ -3,13 +3,12 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-import graphviz as st
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import confusion_matrix
 from sklearn.tree import DecisionTreeClassifier, export_graphviz
 
-
+import graphviz
 st.title('Machine Failure Analysis')
 
 uploaded_file = st.file_uploader("Upload your CSV data file (ai4i2020.csv)", type=["csv"])
