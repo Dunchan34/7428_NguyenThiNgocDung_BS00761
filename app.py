@@ -37,11 +37,11 @@ if uploaded_file is not None:
     df['lead_time'] = np.random.randint(10, 60, size=len(df))
 
     st.header("Figure 37: Distribution of Machine Temperature")
-    plt.figure(figsize=(8, 6))
-    sns.histplot(df['machine_temperature'], kde=True, color='blue')
-    plt.xlabel('Air Temperature (K)')
-    plt.ylabel('Frequency')
-    st.pyplot()
+fig, ax = plt.subplots(figsize=(8, 6))
+sns.histplot(df['machine_temperature'], kde=True, color='blue', ax=ax)
+ax.set_xlabel('Air Temperature (K)')
+ax.set_ylabel('Frequency')
+st.pyplot(fig)  # truyền figure vào st.pyplot()
 
     st.header("Figure 38: Defect Rates by Material Quality")
     defect_rates = df.groupby('material_quality')['defect_status'].mean().reset_index()
