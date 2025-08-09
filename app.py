@@ -9,7 +9,6 @@ from sklearn.metrics import confusion_matrix
 
 st.title('Machine Failure Analysis')
 
-# Bạn có thể thay phần upload bằng đọc file trực tiếp từ Github nếu muốn
 uploaded_file = st.file_uploader("Upload your CSV data file (ai4i2020.csv)", type=["csv"])
 
 if uploaded_file is not None:
@@ -37,40 +36,40 @@ if uploaded_file is not None:
     df['lead_time'] = np.random.randint(10, 60, size=len(df))
 
     st.header("Figure 37: Distribution of Machine Temperature")
-fig, ax = plt.subplots(figsize=(8, 6))
-sns.histplot(df['machine_temperature'], kde=True, color='blue', ax=ax)
-ax.set_xlabel('Air Temperature (K)')
-ax.set_ylabel('Frequency')
-st.pyplot(fig)  # truyền figure vào st.pyplot()
+    fig, ax = plt.subplots(figsize=(8, 6))
+    sns.histplot(df['machine_temperature'], kde=True, color='blue', ax=ax)
+    ax.set_xlabel('Air Temperature (K)')
+    ax.set_ylabel('Frequency')
+    st.pyplot(fig)
 
-st.header("Figure 38: Defect Rates by Material Quality")
-defect_rates = df.groupby('material_quality')['defect_status'].mean().reset_index()
-    plt.figure(figsize=(8, 6))
+    st.header("Figure 38: Defect Rates by Material Quality")
+    defect_rates = df.groupby('material_quality')['defect_status'].mean().reset_index()
+    fig, ax = plt.subplots(figsize=(8, 6))
     sns.barplot(x='material_quality', y='defect_status', data=defect_rates,
-                palette=['#1f77b4', '#ff7f0e', '#2ca02c'])
-    plt.xlabel('Material Quality (L: Low, M: Medium, H: High)')
-    plt.ylabel('Defect Rate')
-    st.pyplot()
+                palette=['#1f77b4', '#ff7f0e', '#2ca02c'], ax=ax)
+    ax.set_xlabel('Material Quality (L: Low, M: Medium, H: High)')
+    ax.set_ylabel('Defect Rate')
+    st.pyplot(fig)
 
     st.header("Figure 39: Correlation Heatmap")
     corr = df[['machine_temperature', 'humidity', 'lead_time', 'defect_status']].corr()
-    plt.figure(figsize=(8, 6))
-    sns.heatmap(corr, annot=True, cmap='coolwarm', vmin=-1, vmax=1)
-    st.pyplot()
+    fig, ax = plt.subplots(figsize=(8, 6))
+    sns.heatmap(corr, annot=True, cmap='coolwarm', vmin=-1, vmax=1, ax=ax)
+    st.pyplot(fig)
 
     st.header("Figure 40: Boxplot of Defects vs. Machine Temperature")
-    plt.figure(figsize=(8, 6))
-    sns.boxplot(x='defect_status', y='machine_temperature', data=df)
-    plt.xlabel('Defect Status (0: Pass, 1: Fail)')
-    plt.ylabel('Machine Temperature (K)')
-    st.pyplot()
+    fig, ax = plt.subplots(figsize=(8, 6))
+    sns.boxplot(x='defect_status', y='machine_temperature', data=df, ax=ax)
+    ax.set_xlabel('Defect Status (0: Pass, 1: Fail)')
+    ax.set_ylabel('Machine Temperature (K)')
+    st.pyplot(fig)
 
     st.header("Figure 42: Errors vs. Humidity Box Plot")
-    plt.figure(figsize=(8, 6))
-    sns.boxplot(x='defect_status', y='humidity', data=df)
-    plt.xlabel('Defect Status (0: Pass, 1: Fail)')
-    plt.ylabel('Humidity (%)')
-    st.pyplot()
+    fig, ax = plt.subplots(figsize=(8, 6))
+    sns.boxplot(x='defect_status', y='humidity', data=df, ax=ax)
+    ax.set_xlabel('Defect Status (0: Pass, 1: Fail)')
+    ax.set_ylabel('Humidity (%)')
+    st.pyplot(fig)
 
     # Logistic Regression model
     st.header("Logistic Regression Model")
@@ -88,11 +87,11 @@ defect_rates = df.groupby('material_quality')['defect_status'].mean().reset_inde
     cm = confusion_matrix(y_test, y_pred)
 
     st.subheader("Confusion Matrix")
-    plt.figure(figsize=(6, 4))
-    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
-    plt.xlabel('Predicted')
-    plt.ylabel('Actual')
-    st.pyplot()
+    fig, ax = plt.subplots(figsize=(6, 4))
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', ax=ax)
+    ax.set_xlabel('Predicted')
+    ax.set_ylabel('Actual')
+    st.pyplot(fig)
 
 else:
     st.info("Please upload the ai4i2020.csv file to start the analysis.")
