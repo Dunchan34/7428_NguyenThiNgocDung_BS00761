@@ -1,12 +1,9 @@
-
 import streamlit as st
 import pandas as pd
 import joblib
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.metrics import classification_report, confusion_matrix
-
-st.set_option('deprecation.showPyplotGlobalUse', False)
 
 st.title("Product Quality Prediction - P7 Demo")
 
