@@ -43,8 +43,8 @@ ax.set_xlabel('Air Temperature (K)')
 ax.set_ylabel('Frequency')
 st.pyplot(fig)  # truyền figure vào st.pyplot()
 
-    st.header("Figure 38: Defect Rates by Material Quality")
-    defect_rates = df.groupby('material_quality')['defect_status'].mean().reset_index()
+st.header("Figure 38: Defect Rates by Material Quality")
+defect_rates = df.groupby('material_quality')['defect_status'].mean().reset_index()
     plt.figure(figsize=(8, 6))
     sns.barplot(x='material_quality', y='defect_status', data=defect_rates,
                 palette=['#1f77b4', '#ff7f0e', '#2ca02c'])
